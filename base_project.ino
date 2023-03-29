@@ -10,11 +10,11 @@ String newPasswordString;  //hold the new password
 char newPassword[6];       //character string of newPasswordString
 
 
-//pir1 connected to 12 -> zone1
+//pir1 connected to 49 -> zone1
 //pir2 connected to 41 -> entry_exit
-const int ENTRY_EXIT = 12;
+const int ENTRY_EXIT = 49;
 const int ZONE1 = 41;
-int LED = 11;
+int LED = 47;
 const int buzzerPin = 48;
 const int rs = 52, en = 53, d4 = 4, d5 = 5, d6 = 6, d7 = 7;
 LiquidCrystal lcd(rs, en, d4, d5, d6, d7);
