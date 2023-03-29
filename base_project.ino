@@ -58,6 +58,7 @@ int period = 1000;
 // the setup function runs once when you press reset or power the board
 void setup() {
   Serial.begin(9600);
+  lcd.begin(16,2);
   // initialize digital pin LED_BUILTIN as an output.
   pinMode(LED, OUTPUT);
 
@@ -74,8 +75,9 @@ void loop() {
   my_key();
   if (ON_OFF_STATE) {
     ENTRY_EXIT_STATE = digitalRead(ENTRY_EXIT);
-    Serial.println("ENTRY_EXIT_ACTIVATED");
-    Serial.println(ENTRY_EXIT_ACTIVATED);
+    /*
+    lcd.clear();
+    lcd.print("ENTRY_EXIT_ACTIVATED"); */
     ZONE1_STATE = digitalRead(ZONE1);
     if (ENTRY_EXIT_STATE == 1) {
       countdown();
@@ -84,8 +86,14 @@ void loop() {
       if (ENTRY_EXIT_ACTIVATED%2) {
         ENTRY_EXIT_STATE = HIGH;
       }
-      //Serial.println("ENTRY_EXIT_ACTIVATED ");
-      //Serial.println(ENTRY_EXIT_ACTIVATED);
+    }
+      if(ENTRY_EXIT_STATE == HIGH){
+      lcd.clear();
+      lcd.print("ENTRY_EXIT");
+    }
+   else if(ZONE1_STATE == HIGH){
+      lcd.clear();
+      lcd.print("ZONE1");
     }
     my_key();
     while (ENTRY_EXIT_STATE && ON_OFF_STATE || ZONE1_STATE && ON_OFF_STATE) {
@@ -98,12 +106,15 @@ void loop() {
 
 void countdown() {
   for (int x = 1; x < 6; x++) {
+    if(ON_OFF_STATE==LOW){
+       break;
+      }
     Serial.print("Countdown");
     Serial.println(6 - x);
     my_key();
     lcd.clear();
     lcd.print("Countdown: "); lcd.print(6-x);
-    delay(1000);
+    My_Delay();
     ENTRY_EXIT_STATE = digitalRead(ENTRY_EXIT);
   }
 }
@@ -128,6 +139,8 @@ void processNumberKey(char key) {
   Serial.print(key);
   currentPasswordLength++;
   password.append(key);
+  lcd.setCursor(0,1);
+  lcd.write(key);
   if (currentPasswordLength == maxPasswordLength) {
     checkPassword();
   }
