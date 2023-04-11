@@ -120,7 +120,15 @@ void loop() {
     }
     my_key();
     while (ENTRY_EXIT_STATE && ON_OFF_STATE || ZONE1_STATE && ON_OFF_STATE || ZONE2_STATE && ON_OFF_STATE) {
-
+      if(ENTRY_EXIT_STATE == 1){
+          Serial.println("ENTRY_EXIT_STATE");
+        }
+      else if(ZONE1_STATE == 1){
+          Serial.println("ZONE1_STATE");
+        }
+      else if(ZONE2_STATE == 1){
+          Serial.println("ZONE2_STATE");
+        }
       Flash();
       my_key();
     }
