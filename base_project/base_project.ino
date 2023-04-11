@@ -75,7 +75,6 @@ void setup() {
   pinMode(ENTRY_EXIT, INPUT_PULLUP);
   pinMode(ZONE1, INPUT_PULLUP);
 
-  Serial.println("Turn On Alarm ");
   lcd.clear();
   lcd.print(" Enter password ");
 }
@@ -90,14 +89,15 @@ void loop() {
     lcd.print("ENTRY_EXIT_ACTIVATED"); */
     ZONE1_STATE = digitalRead(ZONE1);
     distanceCheck = distanceReturner();
-    Serial.print("Distance: "); Serial.println(distanceCheck);
     if(distanceCheck<=20){
         ZONE2_STATE = HIGH;
       }
       else{
           ZONE2_STATE = LOW;
         }
-      Serial.print("ZONE2_STATE = "); Serial.println(ZONE2_STATE );
+    Serial.print(ENTRY_EXIT_STATE); Serial.print(", ");
+    Serial.print(ZONE1_STATE); Serial.print(", ");
+    Serial.println(ZONE2_STATE);
     if (ENTRY_EXIT_STATE == 1) {
       countdown();
       ENTRY_EXIT_STATE = 0;
@@ -132,8 +132,6 @@ void countdown() {
     if(ON_OFF_STATE==LOW){
        break;
       }
-    Serial.print("Countdown");
-    Serial.println(6 - x);
     my_key();
     lcd.clear();
     lcd.print("Countdown: "); lcd.print(6-x);
@@ -159,7 +157,6 @@ void my_key() {
 }
 
 void processNumberKey(char key) {
-  Serial.print(key);
   currentPasswordLength++;
   password.append(key);
   lcd.setCursor(0,1);
@@ -171,20 +168,20 @@ void processNumberKey(char key) {
 
 void checkPassword() {
   if (password.evaluate()) {
-    Serial.println(" OK.");
+    //Serial.println(" OK.");
     ON_OFF_STATE = ON_OFF_STATE ^ 1;
     if(ON_OFF_STATE==HIGH){
-        Serial.println("The alarm is armed.");
+       // Serial.println("The alarm is armed.");
         lcd.clear();
         lcd.print("Alarm is armed");
       }
     else{
-      Serial.println("The alarm disarmed.");
+      //Serial.println("The alarm disarmed.");
       lcd.clear();
       lcd.print("Alarm disarmed");
       }
   } else {
-    Serial.println(" Wrong password!");
+    //Serial.println(" Wrong password!");
     lcd.clear();
     lcd.print(" Wrong password!");
   }
