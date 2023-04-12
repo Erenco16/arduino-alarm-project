@@ -15,13 +15,14 @@ char newPassword[6];       //character string of newPasswordString
 // ultrasonic sensor connected to 10 -> zone2
 const int ENTRY_EXIT = 49;
 const int ZONE1 = 41;
-int LED = 47;
-const int buzzerPin = 48;
-const int rs = 52, en = 53, d4 = 4, d5 = 5, d6 = 6, d7 = 7;
+int LED = 47; // led pin connected to 47
+const int buzzerPin = 48; // buzzer pin connected to 48
+const int rs = 52, en = 53, d4 = 4, d5 = 5, d6 = 6, d7 = 7; // lcd oins are connected
 LiquidCrystal lcd(rs, en, d4, d5, d6, d7);
 // variables for ultrasonic sensor
 const int trigPin = 9;
-const int ZONE2 = 10;
+const int ZONE2 = 10; // echoPin
+// variables to check the distance for ultrasonic sensor
 long duration;
 int distance;
 int distanceCheck = 100;
@@ -34,7 +35,6 @@ int ZONE2_STATE;
 
 
 //initialize password to 1234
-//you can use password.set(newPassword) to overwrite it
 Password password = Password("1234");
 
 byte maxPasswordLength = 6;
@@ -82,12 +82,12 @@ void setup() {
 // the loop function runs over and over again forever
 void loop() {
   my_key();
+  // if the correct password has been inputted, go in that condition
   if (ON_OFF_STATE) {
+    // checking the alarm statuses
     ENTRY_EXIT_STATE = digitalRead(ENTRY_EXIT);
-    /*
-    lcd.clear();
-    lcd.print("ENTRY_EXIT_ACTIVATED"); */
     ZONE1_STATE = digitalRead(ZONE1);
+    // if distance is less than 20, trigger the alarm for ultrasonic sensor
     distanceCheck = distanceReturner();
     if(distanceCheck<=20){
         ZONE2_STATE = HIGH;
@@ -95,60 +95,53 @@ void loop() {
       else{
           ZONE2_STATE = LOW;
         }
-    Serial.print(ENTRY_EXIT_STATE); Serial.print(", ");
-    Serial.print(ZONE1_STATE); Serial.print(", ");
-    Serial.println(ZONE2_STATE);
+    // entry exit is being triggered here
     if (ENTRY_EXIT_STATE == 1) {
-      countdown();
+      countdown(); // 5 seconds of countdown
       ENTRY_EXIT_STATE = 0;
       ENTRY_EXIT_ACTIVATED++;
-      if (ENTRY_EXIT_ACTIVATED%2) {
+      if (ENTRY_EXIT_ACTIVATED%2) { // if ENTRY_EXIT_ACTIVATED is 2, trigger the alarm, otherwise do not. Because we want the alarm to trigger on the second attempt
         ENTRY_EXIT_STATE = HIGH;
       }
     }
-      if(ENTRY_EXIT_STATE == HIGH){
-      lcd.clear();
-      lcd.print("ENTRY_EXIT");
-    }
-   else if(ZONE1_STATE == HIGH){
-      lcd.clear();
-      lcd.print("ZONE1");
-    }
-    else if(ZONE2_STATE == HIGH){
-      lcd.clear();
-      lcd.print("ZONE2");
-    }
-    my_key();
-    while (ENTRY_EXIT_STATE && ON_OFF_STATE || ZONE1_STATE && ON_OFF_STATE || ZONE2_STATE && ON_OFF_STATE) {
+    my_key(); // geting password from the user
+    while (ENTRY_EXIT_STATE && ON_OFF_STATE || ZONE1_STATE && ON_OFF_STATE || ZONE2_STATE && ON_OFF_STATE) { //prompting the alarm messages for Processing and LCD display. Also our alarm triggers here as well.
       if(ENTRY_EXIT_STATE == 1){
           Serial.println("ENTRY_EXIT_STATE");
+          lcd.clear();
+          lcd.print("ENTRY_EXIT");
         }
       else if(ZONE1_STATE == 1){
           Serial.println("ZONE1_STATE");
+          lcd.clear();
+          lcd.print("ZONE1_STATE");
         }
       else if(ZONE2_STATE == 1){
           Serial.println("ZONE2_STATE");
+          lcd.clear();
+          lcd.print("ZONE2_STATE");
         }
-      Flash();
-      my_key();
+      Flash(); // led flashing and buzzer
+      my_key(); // getting password from the user again
     }
   }
 }
 
+// 5 seconds of countdown
 void countdown() {
   for (int x = 1; x < 6; x++) {
-    if(ON_OFF_STATE==LOW){
+    if(ON_OFF_STATE==LOW){ // stop counting if password is correct
        break;
       }
     my_key();
     lcd.clear();
     lcd.print("Countdown: "); lcd.print(6-x);
-    My_Delay();
+    My_Delay(); // millis() is used so that the user can input password while the countdown is triggered.
     ENTRY_EXIT_STATE = digitalRead(ENTRY_EXIT);
   }
 }
 
-void my_key() {
+void my_key() { // reading the password here and then checking and processing
   char key = keypad.getKey();
   if (key != NO_KEY) {
     delay(60);
@@ -164,7 +157,7 @@ void my_key() {
   }
 }
 
-void processNumberKey(char key) {
+void processNumberKey(char key) { // appending each key to a password so that it can be checked whether is true or not
   currentPasswordLength++;
   password.append(key);
   lcd.setCursor(0,1);
@@ -174,22 +167,19 @@ void processNumberKey(char key) {
   }
 }
 
-void checkPassword() {
+void checkPassword() { // checking if the password is whether true or not
   if (password.evaluate()) {
-    //Serial.println(" OK.");
     ON_OFF_STATE = ON_OFF_STATE ^ 1;
     if(ON_OFF_STATE==HIGH){
-       // Serial.println("The alarm is armed.");
         lcd.clear();
         lcd.print("Alarm is armed");
       }
     else{
-      //Serial.println("The alarm disarmed.");
+      Serial.println("Alarm disarmed");
       lcd.clear();
       lcd.print("Alarm disarmed");
       }
   } else {
-    //Serial.println(" Wrong password!");
     lcd.clear();
     lcd.print(" Wrong password!");
   }
@@ -215,12 +205,12 @@ void Flash() {
 void My_Delay() {
   time_now = millis();
   while (millis() < time_now + period) {
-    my_key();
+    my_key(); // for user to input password
     // wait appox. [period] ms
   }
 }
 
-int distanceReturner(){
+int distanceReturner(){ // returns the distance between the object and the ultrasonic sensor
     // Clears the trigPin
   digitalWrite(trigPin, LOW);
   delayMicroseconds(2);
@@ -231,6 +221,6 @@ int distanceReturner(){
   // Reads the ZONE2, returns the sound wave travel time in microseconds
   duration = pulseIn(ZONE2, HIGH);
   // Calculating the distance
-  distance = duration * 0.034 / 2;
+  distance = duration * 0.034 / 2; // 0.034 is the speed of the sound wave and divided by 2 because the waves reach the object and bounces back so the measure would be counted twice
   return distance;
   }
