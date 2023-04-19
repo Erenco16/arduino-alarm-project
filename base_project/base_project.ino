@@ -89,7 +89,7 @@ void loop() {
     ZONE1_STATE = digitalRead(ZONE1);
     // if distance is less than 20, trigger the alarm for ultrasonic sensor
     distanceCheck = distanceReturner();
-    if(distanceCheck<=20){
+    if(distanceCheck<=5){
         ZONE2_STATE = HIGH;
       }
       else{
